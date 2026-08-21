@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>client</title>
+  </head>
+  <body class="bg-slate-800 text-slate-300">
+    <header></header>
+    <main>
+      <section>
+        <h2><u>Registration Form</u></h2>
+        <form id="register-form">
+          <div>
+            <p>Email:</p>
+            <input
+              name="email"
+              type="email"
+              placeholder="Enter email here..."
+              required
+            />
+          </div>
+          <div>
+            <p>Username:</p>
+            <input
+              name="username"
+              type="text"
+              placeholder="Enter username here..."
+              required
+            />
+          </div>
+          <div>
+            <p>Password:</p>
+            <input
+              name="password"
+              type="password"
+              placeholder="Enter password here..."
+              required
+            />
+          </div>
+          <button type="submit">Register</button>
+        </form>
+        <br />
+
+        <h2><u>Login Form</u></h2>
+        <form id="login-form">
+          <div>
+            <p>Email:</p>
+            <input
+              name="email"
+              type="email"
+              placeholder="Enter email here..."
+              required
+            />
+          </div>
+          <div>
+            <p>Password:</p>
+            <input
+              name="password"
+              type="password"
+              placeholder="Enter password here..."
+              required
+            />
+          </div>
+          <button type="submit">Login</button>
+        </form>
+
+        <div>
+          <textarea
+            id="serverResponseContainer"
+            name="message"
+            rows="5"
+            cols="40"
+            placeholder="Response will appear here..."
+            readonly
+          ></textarea>
+        </div>
+        <h2>All users:-</h2>
+        <div>
+          <textarea
+            id="userListTable"
+            name="message"
+            rows="5"
+            cols="40"
+            placeholder="User table will appear here..."
+            readonly
+          ></textarea>
+        </div>
+      </section>
+    </main>
+    <footer></footer>
+    <script defer type="module" src="/src/main.ts"></script>
+  </body>
+</html>
