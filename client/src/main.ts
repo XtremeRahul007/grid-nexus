@@ -2,10 +2,9 @@ import "./style.css";
 import { z } from "zod/mini";
 
 async function getUsersList() {
-  const userListTable =
-    document.querySelector<HTMLTextAreaElement>("#userListTable");
+  const userName = document.querySelector<HTMLParagraphElement>("#userName");
 
-  if (!userListTable) return;
+  if (!userName) return;
 
   try {
     const response = await fetch(`http://localhost:5500/api/`);
@@ -15,8 +14,8 @@ async function getUsersList() {
     }
 
     const data = await response.json();
-    if (userListTable) {
-      userListTable!.value = JSON.stringify(data, null, 2);
+    if (userName) {
+      userName!.textContent = JSON.stringify(data, null, 2);
     }
   } catch (error) {
     console.error("Network or parsing error:", error);

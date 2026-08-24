@@ -2,7 +2,7 @@ class AppError extends Error {
   constructor(
     message: string,
     public statusCode: number,
-    public type: "app_error" | "db_error",
+    public type: "app_error" | "db_error" | "auth_error",
   ) {
     super(message);
     Object.setPrototypeOf(this, AppError.prototype);

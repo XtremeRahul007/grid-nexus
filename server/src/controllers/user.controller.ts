@@ -7,10 +7,14 @@ import loginUserSchema, {
   type LoginUser,
 } from "../validators/user.login.validator.js";
 
-export async function getUsers(_: Request, res: Response, next: NextFunction) {
+export async function getUserName(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
-    const result = await userService.getUsersTable();
-    res.status(201).json(result);
+    const username = await userService.getUserName(req.userID);
+    return res.status(200).json({ type: "authenticated_user_name", username });
   } catch (err) {
     next(err);
   }
@@ -32,7 +36,7 @@ export async function registerUser(
 
     await userService.registerUser(req, user);
 
-    res.status(201).json({
+    return res.status(201).json({
       type: "user_registered_success",
       message: "User registered successfully",
     });
@@ -55,9 +59,16 @@ export async function loginUser(
 
     const user: LoginUser = result.data;
 
-    await userService.loginUser(user);
+    const token = await userService.loginUser(user);
 
-    res.status(201).json({
+    res.cookie("session", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(201).json({
       type: "user_logged_in_success",
       message: "User logged in successfully",
     });

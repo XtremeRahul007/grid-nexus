@@ -5,6 +5,8 @@ declare global {
     interface Request {
       requestId: string;
       timestamp: number;
+      cookieToken: string;
+      userID: number;
     }
   }
 }
