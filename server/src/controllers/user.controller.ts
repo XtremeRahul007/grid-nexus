@@ -63,14 +63,87 @@ export async function loginUser(
 
     res.cookie("session", token, {
       httpOnly: true,
-      secure: true,
+      secure: false,
       sameSite: "lax",
-      maxAge: 30 * 24 * 60 * 60 * 1000,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     return res.status(201).json({
-      type: "user_logged_in_success",
+      type: "user_login_success",
       message: "User logged in successfully",
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function logoutUser(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const token = req.cookieToken;
+    if (token != null) await userService.logoutUser(token);
+
+    res.clearCookie("session", {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+    });
+
+    return res.status(201).json({
+      type: "user_logout_success",
+      message: "User logged out successfully",
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function updateSession(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const token = req.cookieToken;
+    await userService.updateSession(token);
+
+    res.cookie("session", token, {
+      httpOnly: true,
+      secure: false,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      sameSite: "lax",
+    });
+
+    return res.status(201).json({
+      type: "user_session_update_success",
+      message: "User session updated successfully",
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function logoutAllSession(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const userID = req.userID;
+    await userService.logoutAllSession(userID);
+
+    res.clearCookie("session", {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+    });
+
+    res.status(201).json({
+      type: "user_all_sessions_logout_success",
+      message: "All user sessions logged out successfully",
     });
   } catch (err) {
     next(err);

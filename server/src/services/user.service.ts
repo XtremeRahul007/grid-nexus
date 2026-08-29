@@ -14,9 +14,7 @@ export type UserWithHash = Omit<RegistrationUser, "password"> & {
 
 export async function getUserName(userID: number) {
   const result = await userRepository.getUserName(userID);
-  if (!result) {
-    throw new AppError("User doesn't exists", 401, "auth_error");
-  }
+
   return result.username;
 }
 
@@ -27,7 +25,7 @@ export async function loginUser(user: LoginUser): Promise<string> {
   }
 
   const isPasswordValid = await argon2id.verify(
-    result.passwordHash,
+    result.password_hash,
     user.password,
   );
 
@@ -41,6 +39,12 @@ export async function loginUser(user: LoginUser): Promise<string> {
   await userRepository.createSession(result.id, tokenHash);
 
   return token;
+}
+
+export async function logoutUser(token: string) {
+  const tokenHash = cookieTokenHash(token);
+
+  await userRepository.deleteSession(tokenHash);
 }
 
 export async function registerUser(req: Request, user: RegistrationUser) {
@@ -57,17 +61,22 @@ export async function registerUser(req: Request, user: RegistrationUser) {
   await trackUserRegistration(req, user.email, user.username);
 }
 
-export async function authenticateUserId(token: string) {
+export async function authenticateUserId(
+  token: string,
+): Promise<number | null> {
   const tokenHash = cookieTokenHash(token);
 
   const session = await userRepository.findUserIdBySession(tokenHash);
 
-  if (!session) {
-    throw new AppError("Authentication required", 401, "auth_error");
-  }
+  return session != null ? session.user_id : null;
+}
 
-  if (Date.now() > Date.parse(session.expires_at)) {
-    throw new AppError("Authentication required", 401, "auth_error");
-  }
-  return session.user_id;
+export async function updateSession(token: string) {
+  const tokenHash = cookieTokenHash(token);
+
+  await userRepository.updateSession(tokenHash);
+}
+
+export async function logoutAllSession(userID: number) {
+  await userRepository.deleteAllSession(userID);
 }

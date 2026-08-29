@@ -9,7 +9,6 @@ function cookieAuth(req: Request, _res: Response, next: NextFunction) {
       ?.slice("session=".length);
 
     if (token == null) return next();
-
     req.cookieToken = token;
     next();
   } catch (err) {

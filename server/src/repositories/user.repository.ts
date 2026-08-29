@@ -5,8 +5,7 @@ export async function getUserName(
   userID: number,
 ): Promise<{ username: string }> {
   const result = await pool.query(
-    `
-    SELECT username FROM users
+    `SELECT username FROM users
     WHERE id = $1
     `,
     [userID],
@@ -16,7 +15,7 @@ export async function getUserName(
 
 export async function findUserCredentialsByEmail(
   email: string,
-): Promise<{ id: string; passwordHash: string }> {
+): Promise<{ id: string; password_hash: string }> {
   const result = await pool.query(
     `SELECT id, password_hash FROM users WHERE email = $1
     `,
@@ -37,6 +36,15 @@ export async function createSession(
   );
 }
 
+export async function deleteSession(tokenHash: string): Promise<void> {
+  await pool.query(
+    `DELETE FROM sessions
+    WHERE token_hash = $1
+    `,
+    [tokenHash],
+  );
+}
+
 export async function createUser(userWithHash: UserWithHash): Promise<void> {
   const { email, passwordHash, username } = userWithHash;
   await pool.query(
@@ -49,14 +57,46 @@ export async function createUser(userWithHash: UserWithHash): Promise<void> {
 
 export async function findUserIdBySession(
   tokenHash: string,
-): Promise<{ user_id: number; expires_at: string }> {
+): Promise<{ user_id: number }> {
+  console.log(tokenHash);
   const result = await pool.query(
-    `SELECT user_id, expires_at
+    `SELECT user_id
     FROM sessions
-    WHERE token_hash = $1;
+    WHERE token_hash = $1
+    AND expires_at > now()
     `,
     [tokenHash],
   );
 
   return result.rows[0] ?? null;
+}
+
+export async function deleteExpiredSessions(): Promise<number | null> {
+  const result = await pool.query(
+    `DELETE FROM sessions
+    WHERE expires_at <= now()
+    `,
+  );
+
+  return result.rowCount;
+}
+
+export async function updateSession(tokenHash: string) {
+  await pool.query(
+    `UPDATE sessions
+    SET expires_at = now() + INTERVAL '7 days'
+    WHERE token_hash = $1
+    AND expires_at > now()
+    `,
+    [tokenHash],
+  );
+}
+
+export async function deleteAllSession(userID: number) {
+  await pool.query(
+    `DELETE FROM sessions
+    WHERE user_id = $1
+    `,
+    [userID],
+  );
 }

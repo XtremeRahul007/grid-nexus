@@ -13,14 +13,11 @@ function errorFeedbackHandler(
 ) {
   if (err instanceof pg.DatabaseError) {
     postgreSQLErrorFeedback(err, res);
-  }
-  if (err instanceof ZodError) {
+  } else if (err instanceof ZodError) {
     zodErrorFeedback(err, res);
-  }
-  if (err instanceof AppError) {
+  } else if (err instanceof AppError) {
     appErrorFeedback(err, res);
-  }
-  if (err instanceof Error) {
+  } else {
     nodeErrorFeedback(err, res);
   }
   return next(err);
