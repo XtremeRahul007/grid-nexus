@@ -6,7 +6,7 @@ function cookieAuth(req: Request, _res: Response, next: NextFunction) {
       ?.split(";")
       .map((cookie) => cookie.trim())
       .find((cookie) => cookie.startsWith("session="))
-      ?.slice("session=".length);
+      ?.slice(8);
 
     if (token == null) return next();
     req.cookieToken = token;

@@ -7,6 +7,8 @@ import type { RegistrationUser } from "../validators/user.registration.validator
 import type { LoginUser } from "../validators/user.login.validator.js";
 import AppError from "../core/AppError.js";
 import { cookieTokenHash } from "../utils/cookieTokenHash.js";
+import { th } from "zod/v4/locales";
+import { threadName } from "worker_threads";
 
 export type UserWithHash = Omit<RegistrationUser, "password"> & {
   passwordHash: string;
@@ -79,4 +81,16 @@ export async function updateSession(token: string) {
 
 export async function logoutAllSession(userID: number) {
   await userRepository.deleteAllSession(userID);
+}
+
+export async function deleteAccount(userID: number, password: string) {
+  const result = await userRepository.getUserPasswordHash(userID);
+
+  const isPasswordValid = await argon2id.verify(result.password_hash, password);
+
+  if (!isPasswordValid) {
+    throw new AppError("Invalid password", 401, "db_error");
+  }
+
+  await userRepository.deleteUser(userID);
 }

@@ -6,6 +6,9 @@ import registrationUserSchema, {
 import loginUserSchema, {
   type LoginUser,
 } from "../validators/user.login.validator.js";
+import userPasswordSchema, {
+  type UserPassword,
+} from "../validators/user.password.validator.js";
 
 export async function getUserName(
   req: Request,
@@ -144,6 +147,30 @@ export async function logoutAllSession(
     res.status(201).json({
       type: "user_all_sessions_logout_success",
       message: "All user sessions logged out successfully",
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function deleteUser(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const userID = req.userID;
+    await userService.deleteAccount(userID, req.userPassword);
+
+    res.clearCookie("session", {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+    });
+
+    res.status(201).json({
+      type: "user_delete_success",
+      message: "User deleted successfully",
     });
   } catch (err) {
     next(err);

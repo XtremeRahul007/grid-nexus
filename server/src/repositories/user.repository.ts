@@ -81,7 +81,7 @@ export async function deleteExpiredSessions(): Promise<number | null> {
   return result.rowCount;
 }
 
-export async function updateSession(tokenHash: string) {
+export async function updateSession(tokenHash: string): Promise<void> {
   await pool.query(
     `UPDATE sessions
     SET expires_at = now() + INTERVAL '7 days'
@@ -92,10 +92,31 @@ export async function updateSession(tokenHash: string) {
   );
 }
 
-export async function deleteAllSession(userID: number) {
+export async function deleteAllSession(userID: number): Promise<void> {
   await pool.query(
     `DELETE FROM sessions
     WHERE user_id = $1
+    `,
+    [userID],
+  );
+}
+
+export async function getUserPasswordHash(userID: number): Promise<{
+  password_hash: string;
+}> {
+  const result = await pool.query(
+    `SELECT password_hash FROM users
+    WHERE id = $1
+    `,
+    [userID],
+  );
+  return result.rows[0] ?? null;
+}
+
+export async function deleteUser(userID: number): Promise<void> {
+  await pool.query(
+    `DELETE FROM users
+    WHERE id = $1
     `,
     [userID],
   );

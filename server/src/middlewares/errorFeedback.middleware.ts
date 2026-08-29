@@ -48,7 +48,7 @@ function postgreSQLErrorFeedback(err: DatabaseError, res: Response) {
   }
 }
 
-function zodErrorFeedback(err: ZodError, res: Response) {
+export function zodErrorFeedback(err: ZodError, res: Response) {
   const flattenedErrors = z.flattenError(err);
   const { formErrors, fieldErrors } = flattenedErrors;
   return res.status(400).json({

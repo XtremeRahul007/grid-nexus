@@ -7,6 +7,7 @@ declare global {
       timestamp: number;
       cookieToken: string;
       userID: number;
+      userPassword: string;
     }
   }
 }

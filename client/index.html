@@ -39,7 +39,7 @@
               required
             />
           </div>
-          <button type="submit">Register</button>
+          <button type="submit">REGISTER</button>
         </form>
         <br />
 
@@ -63,9 +63,26 @@
               required
             />
           </div>
-          <button type="submit">Login</button>
+          <button type="submit">LOGIN</button>
         </form>
+        <br />
 
+        <h2><u>Delete Account</u></h2>
+        <form id="delete-account-form">
+          <div>
+            <p>Password:</p>
+            <input
+              name="password"
+              type="password"
+              placeholder="Enter password here..."
+              required
+            />
+          </div>
+          <button type="submit">DELETE</button>
+        </form>
+        <br />
+
+        <h2><u>Response Area</u></h2>
         <div>
           <textarea
             id="serverResponseContainer"
@@ -84,7 +101,9 @@
           <button type="button" id="logoutButton">Logout</button>
         </div>
         <div>
-          <button type="button" id="logoutEveryWhereButton">Logout Everywhere</button>
+          <button type="button" id="logoutEveryWhereButton">
+            Logout Everywhere
+          </button>
         </div>
       </section>
     </main>

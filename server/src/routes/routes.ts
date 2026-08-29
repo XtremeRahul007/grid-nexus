@@ -6,10 +6,12 @@ import {
   logoutUser,
   updateSession,
   logoutAllSession,
+  deleteUser,
 } from "../controllers/user.controller.js";
 import { requireAuth } from "../middlewares/requireAuth.middleware.js";
 import verifySession from "../middlewares/verifySession.middleware.js";
 import cookieAuth from "../middlewares/cookieAuth.middleware.js";
+import verifyPassword from "../middlewares/verifyPassword.middleware.js";
 
 const router = express.Router();
 
@@ -31,5 +33,13 @@ router.get(
 router.get("/api/logout", cookieAuth, verifySession, logoutUser);
 router.post("/api/register", registerUser);
 router.post("/api/login", loginUser);
+router.delete(
+  "/api/account",
+  cookieAuth,
+  verifySession,
+  requireAuth,
+  verifyPassword,
+  deleteUser,
+);
 
 export default router;

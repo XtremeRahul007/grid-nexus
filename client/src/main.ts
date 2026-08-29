@@ -69,18 +69,9 @@ async function registerUser() {
       const result = registrationUserSchema.safeParse(userData);
 
       if (!result.success) {
-        const flattenedErrors = z.flattenError(result.error);
-        const { formErrors, fieldErrors } = flattenedErrors;
+        const err = zodError(result.error);
         if (responseContainer)
-          responseContainer.value = JSON.stringify(
-            {
-              type: "validation_error",
-              errors: fieldErrors,
-              formErrors: formErrors.length ? formErrors : undefined,
-            },
-            null,
-            2,
-          );
+          responseContainer.value = JSON.stringify(err, null, 2);
         return;
       }
 
@@ -103,20 +94,30 @@ async function registerUser() {
 
 async function loginUser() {
   const form = document.querySelector<HTMLFormElement>("#login-form");
+  const { default: loginUserSchema } =
+    await import("../../server/src/validators/user.login.validator");
   try {
     form?.addEventListener("submit", async (e: Event) => {
       e.preventDefault();
       const formData = new FormData(form);
 
-      const result = {
+      const userData = {
         email: formData.get("email"),
         password: formData.get("password"),
       };
 
+      const result = loginUserSchema.safeParse(userData);
+      if (!result.success) {
+        const err = zodError(result.error);
+        if (responseContainer)
+          responseContainer.value = JSON.stringify(err, null, 2);
+        return;
+      }
+
       const response = await fetch(`${IP}:${PORT}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(result),
+        body: JSON.stringify(result.data),
         credentials: "include",
       });
 
@@ -196,6 +197,46 @@ async function logoutEverywhere() {
   }
 }
 
+async function deleteAccount() {
+  const form = document.getElementById(
+    "delete-account-form",
+  ) as HTMLFormElement;
+  const { default: userPasswordSchema } =
+    await import("../../server/src/validators/user.password.validator");
+  try {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+
+      const userData = { password: formData.get("password") };
+
+      const result = userPasswordSchema.safeParse(userData);
+
+      if (!result.success) {
+        const err = zodError(result.error);
+        if (responseContainer)
+          responseContainer.value = JSON.stringify(err, null, 2);
+        return;
+      }
+
+      const response = await fetch(`${IP}:${PORT}/api/account`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(result.data),
+      });
+
+      const data = await apiResponseJsonParse(response);
+      if (responseContainer) {
+        responseContainer.value = JSON.stringify(data, null, 2);
+      }
+    });
+  } catch (err) {
+    console.error("Network or parsing error:", err);
+  }
+}
+
 async function apiResponseJsonParse(response: Response) {
   if (!response.ok) {
     console.error(`Request failed with status ${response.status}`);
@@ -208,6 +249,16 @@ async function apiResponseJsonParse(response: Response) {
   return await response.json();
 }
 
+function zodError(err: any) {
+  const flattenedErrors = z.flattenError(err);
+  const { formErrors, fieldErrors } = flattenedErrors;
+  return {
+    type: "validation_error",
+    errors: fieldErrors,
+    formErrors: formErrors.length ? formErrors : undefined,
+  };
+}
+
 async function runApp() {
   responseContainer = document.querySelector<HTMLTextAreaElement>(
     "#serverResponseContainer",
@@ -218,6 +269,7 @@ async function runApp() {
   await loginUser();
   await logoutUser();
   await logoutEverywhere();
+  await deleteAccount();
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
