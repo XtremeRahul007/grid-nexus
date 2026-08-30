@@ -35,7 +35,10 @@ src
 
 ### Backend Diagram
 
-[Click to View](https://xtremerahul007.github.io/diagram-viewer-tool/#user-registration-diagram)
+| Diagram Name           | Link                                                                                             |
+| ---------------------- | ------------------------------------------------------------------------------------------------ |
+| User Registration Flow | [Click to View](https://xtremerahul007.github.io/diagram-viewer-tool/#user-registration-diagram) |
+| User Login Flow        | [Click to View](https://xtremerahul007.github.io/diagram-viewer-tool/#user-login-diagram)        |
 
 [back to top](#grid-nexus)
 
