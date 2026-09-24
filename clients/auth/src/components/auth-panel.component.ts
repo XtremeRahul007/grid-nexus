@@ -70,6 +70,27 @@ function attachTermsValidation(): void {
   });
 }
 
+function attachLegalDialog(): void {
+  const dialog = getElement<HTMLDialogElement>("legalDialog");
+  const trigger = getElement<HTMLButtonElement>("termsPolicyTrigger");
+  const closeButtons = [
+    getElement<HTMLButtonElement>("legalDialogClose"),
+    getElement<HTMLButtonElement>("legalDialogDone"),
+  ];
+
+  trigger.addEventListener("click", () => {
+    dialog.showModal();
+    closeButtons[0].focus();
+  });
+  closeButtons.forEach((button) => {
+    button.addEventListener("click", () => dialog.close());
+  });
+  dialog.addEventListener("click", (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+  dialog.addEventListener("close", () => trigger.focus());
+}
+
 function attachOtpInputs(): void {
   authModes.forEach((mode) => {
     getSendOtp(mode).addEventListener("click", () => requestOtp(mode));
@@ -139,6 +160,7 @@ export function initializeAuthPanel(): void {
   attachPasswordToggles();
   attachFieldValidation();
   attachTermsValidation();
+  attachLegalDialog();
   attachOtpInputs();
   attachSubmitHandlers();
   authModes.forEach(updateSubmitState);
