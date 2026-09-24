@@ -1,18 +1,23 @@
 import express from "express";
 import cors from "cors";
-import { configDotenv } from "dotenv";
-import router from "./routes/routes.js";
+import dotenv from "dotenv";
+import path from "path";
+import userRouter from "./routes/user.routes.js";
+import otpRouter from "./routes/otp.routes.js";
 import { errorLogger, requestLogger } from "./middlewares/logger.middleware.js";
 import { requestIdMiddleware } from "./middlewares/requestId.middleware.js";
 import errorFeedbackHandler from "./middlewares/errorFeedback.middleware.js";
 import { startScheduler, stopScheduler } from "./jobs/scheduler.js";
 
-configDotenv();
+const __dirname = import.meta.dirname;
+dotenv.config({ path: path.join(__dirname, "../.env") });
+
 const app = express();
 
 const SERVER_PORT = Number(process.env.SERVER_PORT || 5000);
 const CLIENT_PORT = Number(process.env.CLIENT_PORT || 5173);
-const CLIENT_IP = process.env.CLIENT_IP;
+const CLIENT_IP = process.env.CLIENT_IP || "localhost";
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || `http://${CLIENT_IP}:${CLIENT_PORT}`;
 
 const timers = startScheduler();
 
@@ -20,7 +25,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: `http://${CLIENT_IP}:${CLIENT_PORT}`,
+    origin: CLIENT_ORIGIN,
     credentials: true,
   }),
 );
@@ -28,7 +33,9 @@ app.use(
 app.use(requestIdMiddleware);
 app.use(requestLogger);
 
-app.use("/", router);
+app.use("/", userRouter);
+app.use("/auth", express.static(path.join(__dirname, "../public/auth")));
+app.use("/", otpRouter);
 
 app.use(errorFeedbackHandler);
 app.use(errorLogger);

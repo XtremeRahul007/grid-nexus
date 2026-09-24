@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Modern neumorphic sign in and sign up interface"
+    />
+    <title>Neumorphic Auth</title>
+
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="auth-card" aria-label="Authentication">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">GN</div>
+          <span>Grid Nexus</span>
+        </div>
+
+        <div class="forms-wrap">
+          <!-- SIGN IN -->
+          <form class="auth-form active" id="signInForm" novalidate>
+            <div class="heading">
+              <p class="eyebrow">Welcome back</p>
+              <h1>Sign in</h1>
+              <p class="subtitle">Continue where you left off.</p>
+            </div>
+
+            <div class="field">
+              <label for="signin-email">Email address</label>
+              <div class="input-wrap">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Zm0 2 8 6 8-6"
+                  />
+                </svg>
+                <input
+                  id="signin-email"
+                  type="email"
+                  placeholder="you@example.com"
+                  autocomplete="email"
+                  required
+                />
+              </div>
+              <p class="field-error" id="signin-email-error"></p>
+            </div>
+
+            <div class="field">
+              <label for="signin-password">Password</label>
+              <div class="input-wrap">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="4" y="10" width="16" height="11" rx="2" />
+                  <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+                </svg>
+                <input
+                  id="signin-password"
+                  type="password"
+                  placeholder="Enter your password"
+                  autocomplete="current-password"
+                  required
+                />
+                <button
+                  class="toggle-password"
+                  type="button"
+                  aria-label="Show password"
+                >
+                  Show
+                </button>
+              </div>
+              <p class="field-error" id="signin-password-error"></p>
+            </div>
+
+            <div class="otp-field">
+              <label for="signin-otp-1">Verification code</label>
+              <div class="otp-row">
+                <div class="otp-input-wrap" id="signinOtpWrap">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6 10V8a6 6 0 0 1 12 0v2" />
+                    <rect x="4" y="10" width="16" height="11" rx="2" />
+                    <path d="M8 15h.01M12 15h.01M16 15h.01" />
+                  </svg>
+                  <div class="otp-boxes" data-otp-group="signin">
+                    <input
+                      id="signin-otp-1"
+                      inputmode="numeric"
+                      maxlength="1"
+                      aria-label="Sign in OTP digit 1"
+                    />
+                    <input
+                      inputmode="numeric"
+                      maxlength="1"
+                      aria-label="Sign in OTP digit 2"
+                    />
+                    <input
+                      inputmode="numeric"
+                      maxlength="1"
+                      aria-label="Sign in OTP digit 3"
+                    />
+                    <input
+                      inputmode="numeric"
+                      maxlength="1"
+                      aria-label="Sign in OTP digit 4"
+                    />
+                    <input
+                      inputmode="numeric"
+                      maxlength="1"
+                      aria-label="Sign in OTP digit 5"
+                    />
+                    <input
+                      inputmode="numeric"
+                      maxlength="1"
+                      aria-label="Sign in OTP digit 6"
+                    />
+                  </div>
+                </div>
+                <button class="send-otp" id="signinSendOtp" type="button">
+                  Send OTP
+                </button>
+              </div>
+              <p class="field-hint" id="signinOtpHint">
+                Enter the 6-digit code sent to your email.
+              </p>
+              <p class="field-error" id="signin-otp-error"></p>
+            </div>
+
+            <label class="check-row">
+              <input type="checkbox" />
+              <span class="custom-check"></span>
+              <span>Keep me signed in</span>
+            </label>
+
+            <button
+              class="primary-btn"
+              id="signinSubmit"
+              type="submit"
+              disabled
+            >
+              <span>Sign in</span>
+              <span class="btn-arrow" aria-hidden="true">→</span>
+            </button>
+
+            <p class="switch-text">
+              Don't have an account?
+              <button type="button" class="switch-btn" data-target="signup">
+                Create one
+              </button>
+            </p>
+          </form>
+
+          <!-- SIGN UP -->
+          <form class="auth-form" id="signUpForm" novalidate>
+            <div class="heading">
+              <p class="eyebrow">Get started</p>
+              <h1>Create account</h1>
+              <p class="subtitle">A few details and you're in.</p>
+            </div>
+
+            <div class="field">
+              <label for="signup-username">Username</label>
+              <div class="input-wrap">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="8" r="4" />
+                  <path d="M4 21c.8-4 3.4-6 8-6s7.2 2 8 6" />
+                </svg>
+                <input
+                  id="signup-username"
+                  type="text"
+                  placeholder="Choose a username"
+                  autocomplete="username"
+                  minlength="3"
+                  maxlength="30"
+                  pattern="[a-zA-Z0-9_]+"
+                  title="Use 3–30 letters, numbers, or underscores"
+                  required
+                />
+              </div>
+              <p class="field-error" id="signup-username-error"></p>
+            </div>
+
+            <div class="field">
+              <label for="signup-email">Email address</label>
+              <div class="input-wrap">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Zm0 2 8 6 8-6"
+                  />
+                </svg>
+                <input
+                  id="signup-email"
+                  type="email"
+                  placeholder="you@example.com"
+                  autocomplete="email"
+                  required
+                />
+              </div>
+              <p class="field-error" id="signup-email-error"></p>
+            </div>
+
+            <div class="field">
+              <label for="signup-password">Password</label>
+              <div class="input-wrap">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="4" y="10" width="16" height="11" rx="2" />
+                  <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+                </svg>
+                <input
+                  id="signup-password"
+                  type="password"
+                  placeholder="Create a password"
+                  autocomplete="new-password"
+                  required
+                  minlength="8"
+                />
+                <button
+                  class="toggle-password"
+                  type="button"
+                  aria-label="Show password"
+                >
+                  Show
+                </button>
+              </div>
+              <p class="field-error" id="signup-password-error"></p>
+            </div>
+
+            <div class="otp-field">
+              <label for="signup-otp-1">Verification code</label>
+              <div class="otp-row">
+                <div class="otp-input-wrap" id="signupOtpWrap">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6 10V8a6 6 0 0 1 12 0v2" />
+                    <rect x="4" y="10" width="16" height="11" rx="2" />
+                    <path d="M8 15h.01M12 15h.01M16 15h.01" />
+                  </svg>
+                  <div class="otp-boxes" data-otp-group="signup">
+                    <input
+                      id="signup-otp-1"
+                      inputmode="numeric"
+                      maxlength="1"
+                      aria-label="Sign up OTP digit 1"
+                    />
+                    <input
+                      inputmode="numeric"
+                      maxlength="1"
+                      aria-label="Sign up OTP digit 2"
+                    />
+                    <input
+                      inputmode="numeric"
+                      maxlength="1"
+                      aria-label="Sign up OTP digit 3"
+                    />
+                    <input
+                      inputmode="numeric"
+                      maxlength="1"
+                      aria-label="Sign up OTP digit 4"
+                    />
+                    <input
+                      inputmode="numeric"
+                      maxlength="1"
+                      aria-label="Sign up OTP digit 5"
+                    />
+                    <input
+                      inputmode="numeric"
+                      maxlength="1"
+                      aria-label="Sign up OTP digit 6"
+                    />
+                  </div>
+                </div>
+                <button class="send-otp" id="signupSendOtp" type="button">
+                  Send OTP
+                </button>
+              </div>
+              <p class="field-hint" id="signupOtpHint">
+                Enter the 6-digit code sent to your email.
+              </p>
+              <p class="field-error" id="signup-otp-error"></p>
+            </div>
+
+            <label class="check-row terms">
+              <input id="signup-terms" type="checkbox" required />
+              <span class="custom-check"></span>
+              <span
+                >I agree to the
+                <a href="#" class="text-link">terms & privacy policy</a></span
+              >
+            </label>
+            <p class="field-error terms-error" id="signup-terms-error"></p>
+
+            <button
+              class="primary-btn"
+              id="signupSubmit"
+              type="submit"
+              disabled
+            >
+              <span>Create account</span>
+              <span class="btn-arrow" aria-hidden="true">→</span>
+            </button>
+
+            <p class="switch-text">
+              Already have an account?
+              <button type="button" class="switch-btn" data-target="signin">
+                Sign in
+              </button>
+            </p>
+          </form>
+        </div>
+
+        <div class="status" id="status" role="status" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

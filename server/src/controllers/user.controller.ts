@@ -1,14 +1,14 @@
 import type { NextFunction, Request, Response } from "express";
 import * as userService from "../services/user.service.js";
-import registrationUserSchema, {
-  type RegistrationUser,
-} from "../validators/user.registration.validator.js";
 import loginUserSchema, {
   type LoginUser,
 } from "../validators/user.login.validator.js";
-import userPasswordSchema, {
-  type UserPassword,
-} from "../validators/user.password.validator.js";
+import {
+  registrationUserSchema,
+  type RegistrationUser,
+} from "../validators/user.registration.validator.js";
+import { parseWithSchema } from "../utils/zodErrorHandler.js";
+import { ApiResponse } from "../core/responses/ApiResponse.js";
 
 export async function getUserName(
   req: Request,
@@ -17,7 +17,15 @@ export async function getUserName(
 ) {
   try {
     const username = await userService.getUserName(req.userID);
-    return res.status(200).json({ type: "authenticated_user_name", username });
+    return res
+      .status(200)
+      .json(
+        ApiResponse.success(
+          { type: "AUTHENTICATED_USER_NAME", username },
+          "User name retrieved successfully",
+          200,
+        ),
+      );
   } catch (err) {
     next(err);
   }
@@ -29,20 +37,24 @@ export async function registerUser(
   next: NextFunction,
 ) {
   try {
-    const result = registrationUserSchema.safeParse(req.body);
+    const result = parseWithSchema(registrationUserSchema, req.body);
 
-    if (!result.success) {
-      throw result.error;
-    }
+    const user = result as RegistrationUser;
 
-    const user: RegistrationUser = result.data;
+    const challenge_id = req.challenge_id;
 
-    await userService.registerUser(req, user);
+    await userService.registerUser(req, user, challenge_id);
 
-    return res.status(201).json({
-      type: "user_registered_success",
-      message: "User registered successfully",
+    res.clearCookie("challenge_id", {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      path: "/",
     });
+
+    return res
+      .status(201)
+      .json(ApiResponse.success(null, "User registered successfully", 201));
   } catch (err) {
     next(err);
   }
@@ -54,27 +66,32 @@ export async function loginUser(
   next: NextFunction,
 ) {
   try {
-    const result = loginUserSchema.safeParse(req.body);
+    const result = parseWithSchema(loginUserSchema, req.body);
 
-    if (!result.success) {
-      throw result.error;
-    }
+    const user = result as LoginUser;
 
-    const user: LoginUser = result.data;
+    const challenge_id = req.challenge_id;
 
-    const token = await userService.loginUser(user);
+    const token = await userService.loginUser(user, challenge_id);
 
     res.cookie("session", token, {
       httpOnly: true,
       secure: false,
       sameSite: "lax",
+      path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return res.status(201).json({
-      type: "user_login_success",
-      message: "User logged in successfully",
+    res.clearCookie("challenge_id", {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      path: "/",
     });
+
+    return res
+      .status(201)
+      .json(ApiResponse.success(null, "User logged in successfully", 201));
   } catch (err) {
     next(err);
   }
@@ -93,12 +110,12 @@ export async function logoutUser(
       httpOnly: true,
       secure: false,
       sameSite: "lax",
+      path: "/",
     });
 
-    return res.status(201).json({
-      type: "user_logout_success",
-      message: "User logged out successfully",
-    });
+    return res
+      .status(201)
+      .json(ApiResponse.success(null, "User logged out successfully", 201));
   } catch (err) {
     next(err);
   }
@@ -118,12 +135,14 @@ export async function updateSession(
       secure: false,
       maxAge: 7 * 24 * 60 * 60 * 1000,
       sameSite: "lax",
+      path: "/",
     });
 
-    return res.status(201).json({
-      type: "user_session_update_success",
-      message: "User session updated successfully",
-    });
+    return res
+      .status(201)
+      .json(
+        ApiResponse.success(null, "User session updated successfully", 201),
+      );
   } catch (err) {
     next(err);
   }
@@ -142,12 +161,18 @@ export async function logoutAllSession(
       httpOnly: true,
       secure: false,
       sameSite: "lax",
+      path: "/",
     });
 
-    res.status(201).json({
-      type: "user_all_sessions_logout_success",
-      message: "All user sessions logged out successfully",
-    });
+    return res
+      .status(201)
+      .json(
+        ApiResponse.success(
+          null,
+          "All user sessions logged out successfully",
+          201,
+        ),
+      );
   } catch (err) {
     next(err);
   }
@@ -166,12 +191,12 @@ export async function deleteUser(
       httpOnly: true,
       secure: false,
       sameSite: "lax",
+      path: "/",
     });
 
-    res.status(201).json({
-      type: "user_delete_success",
-      message: "User deleted successfully",
-    });
+    return res
+      .status(201)
+      .json(ApiResponse.success(null, "User deleted successfully", 201));
   } catch (err) {
     next(err);
   }

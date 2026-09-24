@@ -1,7 +1,9 @@
 import { Pool } from "pg";
-import { configDotenv } from "dotenv";
+import dotenv from "dotenv";
+import path from "path";
 
-configDotenv();
+const __dirname = import.meta.dirname;
+dotenv.config({ path: path.join(__dirname, "../../.env") });
 
 export const pool = new Pool({
   host: process.env.DB_HOST,

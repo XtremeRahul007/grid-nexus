@@ -15,9 +15,9 @@ export async function getUserName(
 
 export async function findUserCredentialsByEmail(
   email: string,
-): Promise<{ id: string; password_hash: string }> {
+): Promise<{ id: string; password_hash: string; username: string }> {
   const result = await pool.query(
-    `SELECT id, password_hash FROM users WHERE email = $1
+    `SELECT id, password_hash, username FROM users WHERE email = $1
     `,
     [email],
   );

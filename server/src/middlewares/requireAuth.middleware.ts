@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import AppError from "../core/AppError.js";
+import AppError from "../core/errors/AppError.js";
 
 export async function requireAuth(
   req: Request,
@@ -8,7 +8,10 @@ export async function requireAuth(
 ) {
   try {
     if (req.userID == null) {
-      throw new AppError("Authentication required", 401, "auth_error");
+      throw new AppError("Authentication required", {
+        statusCode: 401,
+        code: "AUTH_REQUIRED",
+      });
     }
     next();
   } catch (err) {

@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import path from "path";
 import { writeLog } from "../utils/writeLogFile.js";
-import AppError from "../core/AppError.js";
+import AppError from "../core/errors/AppError.js";
 
 const logFolderPath = path.join(process.cwd(), "../logs");
 const reqlogFilePath = path.join(logFolderPath, "logs.log");
