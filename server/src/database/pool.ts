@@ -12,3 +12,13 @@ export const pool = new Pool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
 });
+
+export const connectPool = async () => {
+  try {
+    await pool.connect();
+    console.log("Connected to PostgreSQL");
+  } catch (error) {
+    console.error("Failed to connect to PostgreSQL:", error);
+    process.exit(1);
+  }
+};

@@ -1,17 +1,16 @@
 import nodemailer from "nodemailer";
-
 import {
   generateOtp,
   loadTemplate,
   renderTemplate,
 } from "../utils/emailTemplateHandler.js";
-import * as otpRepository from "../repositories/otp.repository.js";
 import * as userRepository from "../repositories/user.repository.js";
-import { sha256Hasher } from "../utils/sha256Hasher.js";
+import { CryptoHandler } from "../utils/cryptoHandler.js";
 import AppError from "../core/errors/AppError.js";
-import type { purpose } from "../@types/auth.types.js";
+import type { OtpRedisRecord, purpose } from "../@types/auth.types.js";
 import argon2id from "argon2";
 import crypto from "crypto";
+import redisClient from "../database/redis.js";
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST_NAME,
@@ -22,6 +21,8 @@ const transporter = nodemailer.createTransport({
     pass: process.env.SMTP_API_KEY,
   },
 });
+
+const cryptoHandler = new CryptoHandler();
 
 async function sendOtpEmail({
   to,
@@ -56,7 +57,7 @@ export async function sendRegistrationOtp(
   username: string,
 ): Promise<string> {
   const code = generateOtp(6);
-  const codeHash = sha256Hasher(code);
+  const codeHash = cryptoHandler.hash(code);
 
   await sendOtpEmail({
     to: email,
@@ -67,12 +68,14 @@ export async function sendRegistrationOtp(
 
   const { challenge_id_hash, challenge_id } = challengeIdGenerator();
 
-  await otpRepository.createOtpRecord(
-    email,
-    codeHash,
-    "registration",
-    challenge_id_hash,
-  );
+  const otpData: OtpRedisRecord = {
+    otp: codeHash,
+    token: challenge_id_hash,
+    verified: "false",
+  };
+
+  await redisClient.hSet(`otp:registration:${email}`, otpData);
+  await redisClient.expire(`otp:registration:${email}`, 300);
 
   return challenge_id;
 }
@@ -98,7 +101,7 @@ export async function sendLoginOtp(
     });
   }
   const code = generateOtp(6);
-  const codeHash = sha256Hasher(code);
+  const codeHash = cryptoHandler.hash(code);
 
   await sendOtpEmail({
     to: email,
@@ -108,12 +111,14 @@ export async function sendLoginOtp(
   });
   const { challenge_id_hash, challenge_id } = challengeIdGenerator();
 
-  await otpRepository.createOtpRecord(
-    email,
-    codeHash,
-    "login",
-    challenge_id_hash,
-  );
+  const otpData: OtpRedisRecord = {
+    otp: codeHash,
+    token: challenge_id_hash,
+    verified: "false",
+  };
+
+  await redisClient.hSet(`otp:login:${email}`, otpData);
+  await redisClient.expire(`otp:login:${email}`, 300);
 
   return challenge_id;
 }
@@ -124,43 +129,50 @@ export async function verifyOtp(
   challenge_id: string,
   purpose: purpose,
 ) {
-  const codeHash = sha256Hasher(otp);
+  const codeHash = cryptoHandler.hash(otp);
+  const challenge_id_hash = challenge_id
+    ? cryptoHandler.hash(challenge_id)
+    : null;
 
-  const result = await otpRepository.getOtpRecord(
-    email,
-    purpose,
-    sha256Hasher(challenge_id),
-  );
+  if (challenge_id == null) {
+    throw new AppError("Secure session expired. Please request a new code.", {
+      statusCode: 404,
+      code: "SESSION_EXPIRED",
+    });
+  }
 
-  if (!result) {
+  const data = await redisClient.hGetAll(`otp:${purpose}:${email}`);
+  const isVerified = data.verified === "true";
+
+  if (!data.otp) {
     throw new AppError("No OTP found for this email. Request a new code.", {
       statusCode: 404,
       code: "OTP_NOT_FOUND",
     });
   }
 
-  if (result.verified) {
+  if (data.token !== challenge_id_hash) {
+    throw new AppError("Invalid challenge ID.", {
+      statusCode: 400,
+      code: "INVALID_CHALLENGE_ID",
+    });
+  }
+
+  if (isVerified) {
     throw new AppError("This code has already been used. Request a new code.", {
       statusCode: 409,
       code: "OTP_ALREADY_VERIFIED",
     });
   }
 
-  if (Date.parse(result.expires_at) < Date.now()) {
-    throw new AppError("Code has expired. Request a new code.", {
-      statusCode: 410,
-      code: "CODE_EXPIRED",
-    });
-  }
-
-  if (result.code !== codeHash) {
+  if (data.otp !== codeHash) {
     throw new AppError("Incorrect code. Please try again.", {
       statusCode: 400,
       code: "INCORRECT_CODE",
     });
   }
 
-  await otpRepository.markOtpVerified(email, purpose);
+  await redisClient.hSet(`otp:${purpose}:${email}`, { verified: "true" });
 }
 
 export function challengeIdGenerator(): {
@@ -168,7 +180,7 @@ export function challengeIdGenerator(): {
   challenge_id: string;
 } {
   const challenge_id = crypto.randomBytes(32).toString("hex");
-  const challenge_id_hash = sha256Hasher(challenge_id);
+  const challenge_id_hash = cryptoHandler.hash(challenge_id);
 
   return {
     challenge_id_hash,

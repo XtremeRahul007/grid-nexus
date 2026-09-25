@@ -22,3 +22,10 @@ export interface ResponseError {
 }
 
 export type FieldErrors = Record<string, string[]>;
+
+export interface OtpRedisRecord {
+  [key: string]: string;
+  otp: string;
+  token: string;
+  verified: "true" | "false";
+}

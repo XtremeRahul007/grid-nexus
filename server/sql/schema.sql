@@ -25,6 +25,8 @@ CREATE INDEX sessions_expires_at_idx
 ON sessions (expires_at);
 
 
+/* Unavailable
+
 CREATE TABLE otps (
     email text NOT NULL,
     code text NOT NULL,
@@ -40,3 +42,4 @@ SELECT cron.schedule_in_database('otp_cleanup', '* * * * *' ,'DELETE FROM otps W
 --Parameters: Job Name, Schedule, Query, Database Name, Username, Active
 
 -- Have to work more here!!!
+*/

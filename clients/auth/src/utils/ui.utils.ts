@@ -23,6 +23,7 @@ export function shake(element: HTMLElement | null): void {
 export function setFieldError(input: HTMLInputElement, message: string): void {
   const wrap = input.closest<HTMLElement>(".input-wrap");
   const error = document.getElementById(`${input.id}-error`);
+  const wasInvalid = wrap?.classList.contains("invalid") ?? false;
 
   wrap?.classList.remove("valid");
   wrap?.classList.add("invalid");
@@ -30,7 +31,7 @@ export function setFieldError(input: HTMLInputElement, message: string): void {
     error.textContent = message;
     error.classList.add("show");
   }
-  shake(wrap || input);
+  if (!wasInvalid) shake(wrap || input);
 }
 
 export function setFieldValid(input: HTMLInputElement): void {
