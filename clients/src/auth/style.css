@@ -671,7 +671,7 @@ h1 {
     margin-bottom: 38px;
   }
 }
-
+/*
 @media (max-width: 390px) {
   .otp-row {
     grid-template-columns: 1fr;
@@ -683,7 +683,7 @@ h1 {
     gap: 2px;
   }
 }
-
+*/
 @media (max-width: 480px) {
   .legal-dialog {
     width: calc(100% - 20px);

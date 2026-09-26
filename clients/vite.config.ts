@@ -6,8 +6,14 @@ export default defineConfig({
     host: true,
   },
   build: {
-    outDir: "../../server/public/auth",
+    outDir: "/var/www/grid-nexus",
     emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: "./index.html",
+        auth: "./auth/index.html",
+      },
+    },
   },
   root: "./",
 });

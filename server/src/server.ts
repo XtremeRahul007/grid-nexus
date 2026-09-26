@@ -40,7 +40,6 @@ app.use(requestIdMiddleware);
 app.use(requestLogger);
 
 app.use("/", userRouter);
-app.use("/auth", express.static(path.join(__dirname, "../public/auth")));
 app.use("/", otpRouter);
 
 app.use(errorFeedbackHandler);
